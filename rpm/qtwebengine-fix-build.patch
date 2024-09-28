@@ -1,0 +1,227 @@
+diff --git a/src/3rdparty/chromium/base/debug/profiler.h b/src/3rdparty/chromium/base/debug/profiler.h
+index 035affc7c..d8e1a5346 100644
+--- a/src/3rdparty/chromium/base/debug/profiler.h
++++ b/src/3rdparty/chromium/base/debug/profiler.h
+@@ -5,6 +5,7 @@
+ #ifndef BASE_DEBUG_PROFILER_H_
+ #define BASE_DEBUG_PROFILER_H_
+ 
++#include <cstdint>
+ #include <stddef.h>
+ #include <stdint.h>
+ 
+diff --git a/src/3rdparty/chromium/cc/trees/target_property.cc b/src/3rdparty/chromium/cc/trees/target_property.cc
+index 7d73467a9..be4febd9a 100644
+--- a/src/3rdparty/chromium/cc/trees/target_property.cc
++++ b/src/3rdparty/chromium/cc/trees/target_property.cc
+@@ -8,6 +8,8 @@
+ 
+ #include "ui/gfx/animation/keyframe/target_property.h"
+ 
++#include <cstdint>
++
+ namespace cc {
+ 
+ static_assert(TargetProperty::LAST_TARGET_PROPERTY <
+diff --git a/src/3rdparty/chromium/device/base/synchronization/one_writer_seqlock.cc b/src/3rdparty/chromium/device/base/synchronization/one_writer_seqlock.cc
+index c62a00ee0..af54520b7 100644
+--- a/src/3rdparty/chromium/device/base/synchronization/one_writer_seqlock.cc
++++ b/src/3rdparty/chromium/device/base/synchronization/one_writer_seqlock.cc
+@@ -6,6 +6,8 @@
+ 
+ #include "base/threading/platform_thread.h"
+ 
++#include <cstdint>
++
+ namespace device {
+ 
+ OneWriterSeqLock::OneWriterSeqLock() : sequence_(0) {}
+diff --git a/src/3rdparty/chromium/extensions/common/constants.h b/src/3rdparty/chromium/extensions/common/constants.h
+index adbcfa540..5923bd2fe 100644
+--- a/src/3rdparty/chromium/extensions/common/constants.h
++++ b/src/3rdparty/chromium/extensions/common/constants.h
+@@ -13,6 +13,8 @@
+ #include "build/chromeos_buildflags.h"
+ #include "extensions/common/extensions_export.h"
+ 
++#include <cstdint>
++
+ namespace extensions {
+ 
+ // Scheme we serve extension content from.
+diff --git a/src/3rdparty/chromium/gpu/config/gpu_util.h b/src/3rdparty/chromium/gpu/config/gpu_util.h
+index 8edbfbe7d..467ebd65e 100644
+--- a/src/3rdparty/chromium/gpu/config/gpu_util.h
++++ b/src/3rdparty/chromium/gpu/config/gpu_util.h
+@@ -5,6 +5,8 @@
+ #ifndef GPU_CONFIG_GPU_UTIL_H_
+ #define GPU_CONFIG_GPU_UTIL_H_
+ 
++#include <cstdint>
++
+ #include "build/build_config.h"
+ #include "gpu/config/gpu_feature_info.h"
+ #include "gpu/gpu_export.h"
+diff --git a/src/3rdparty/chromium/net/base/parse_number.h b/src/3rdparty/chromium/net/base/parse_number.h
+index f923b18a7..8f3c6ef78 100644
+--- a/src/3rdparty/chromium/net/base/parse_number.h
++++ b/src/3rdparty/chromium/net/base/parse_number.h
+@@ -10,6 +10,8 @@
+ #include "base/strings/string_piece.h"
+ #include "net/base/net_export.h"
+ 
++#include <cstdint>
++
+ // This file contains utility functions for parsing numbers, in the context of
+ // network protocols.
+ //
+diff --git a/src/3rdparty/chromium/ppapi/utility/completion_callback_factory_thread_traits.h b/src/3rdparty/chromium/ppapi/utility/completion_callback_factory_thread_traits.h
+index 7c0dcdecb..97054d476 100644
+--- a/src/3rdparty/chromium/ppapi/utility/completion_callback_factory_thread_traits.h
++++ b/src/3rdparty/chromium/ppapi/utility/completion_callback_factory_thread_traits.h
+@@ -38,6 +38,10 @@ namespace pp {
+ /// As a further optimization, we can add support for this later.
+ class ThreadSafeThreadTraits {
+  public:
++
++  typedef pp::Lock Lock;
++  typedef pp::AutoLock AutoLock;
++
+   class RefCount {
+    public:
+     /// Default constructor. In debug mode, this checks that the object is being
+@@ -67,8 +71,6 @@ class ThreadSafeThreadTraits {
+     int32_t ref_;
+   };
+ 
+-  typedef pp::Lock Lock;
+-  typedef pp::AutoLock AutoLock;
+ };
+ 
+ /// The non-thread-safe version of thread traits. Using this class as the
+diff --git a/src/3rdparty/chromium/third_party/dawn/src/dawn/native/CacheKey.h b/src/3rdparty/chromium/third_party/dawn/src/dawn/native/CacheKey.h
+index 6cec3b6b8..541bba5b1 100644
+--- a/src/3rdparty/chromium/third_party/dawn/src/dawn/native/CacheKey.h
++++ b/src/3rdparty/chromium/third_party/dawn/src/dawn/native/CacheKey.h
+@@ -15,6 +15,7 @@
+ #ifndef SRC_DAWN_NATIVE_CACHEKEY_H_
+ #define SRC_DAWN_NATIVE_CACHEKEY_H_
+ 
++#include <cstdint>
+ #include <utility>
+ 
+ #include "dawn/native/stream/ByteVectorSink.h"
+diff --git a/src/3rdparty/chromium/third_party/libgav1/src/src/utils/threadpool.cc b/src/3rdparty/chromium/third_party/libgav1/src/src/utils/threadpool.cc
+index e171db6c7..dfbd126b4 100644
+--- a/src/3rdparty/chromium/third_party/libgav1/src/src/utils/threadpool.cc
++++ b/src/3rdparty/chromium/third_party/libgav1/src/src/utils/threadpool.cc
+@@ -30,6 +30,7 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <cstring>
++#include <cstdio>
+ #include <new>
+ #include <utility>
+ 
+diff --git a/src/3rdparty/chromium/third_party/perfetto/src/trace_processor/importers/proto/proto_importer_module.h b/src/3rdparty/chromium/third_party/perfetto/src/trace_processor/importers/proto/proto_importer_module.h
+index cc2c3a2b3..8eb694e73 100644
+--- a/src/3rdparty/chromium/third_party/perfetto/src/trace_processor/importers/proto/proto_importer_module.h
++++ b/src/3rdparty/chromium/third_party/perfetto/src/trace_processor/importers/proto/proto_importer_module.h
+@@ -22,6 +22,8 @@
+ #include "perfetto/base/status.h"
+ #include "src/trace_processor/importers/common/trace_parser.h"
+ 
++#include <cstdint>
++
+ namespace perfetto {
+ 
+ namespace protos {
+diff --git a/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp b/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
+index 0101632c5..3f04a2dd2 100644
+--- a/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
++++ b/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
+@@ -15,6 +15,10 @@
+ #include <iterator>
+ #include <string>
+ 
++#include <string.h>
++#include <algorithm>
++#include <iterator>
++
+ static constexpr const char* gColorNames[] = {
+     "aliceblue",
+     "antiquewhite",
+diff --git a/src/3rdparty/chromium/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h b/src/3rdparty/chromium/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h
+index b26de34cc..caa0df9f9 100644
+--- a/src/3rdparty/chromium/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h
++++ b/src/3rdparty/chromium/third_party/vulkan_memory_allocator/include/vk_mem_alloc.h
+@@ -105,6 +105,8 @@ Documentation of all members: vk_mem_alloc.h
+ - [Source repository on GitHub](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator)
+ */
+ 
++#include <cstdio>
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/src/3rdparty/chromium/third_party/webrtc/modules/portal/xdg_session_details.h b/src/3rdparty/chromium/third_party/webrtc/modules/portal/xdg_session_details.h
+index ab52508c2..050229a2f 100644
+--- a/src/3rdparty/chromium/third_party/webrtc/modules/portal/xdg_session_details.h
++++ b/src/3rdparty/chromium/third_party/webrtc/modules/portal/xdg_session_details.h
+@@ -13,6 +13,7 @@
+ 
+ #include <gio/gio.h>
+ 
++#include <cstdint>
+ #include <string>
+ 
+ namespace webrtc {
+diff --git a/src/3rdparty/chromium/ui/events/gesture_event_details.h b/src/3rdparty/chromium/ui/events/gesture_event_details.h
+index bdf840619..68f473f27 100644
+--- a/src/3rdparty/chromium/ui/events/gesture_event_details.h
++++ b/src/3rdparty/chromium/ui/events/gesture_event_details.h
+@@ -5,6 +5,7 @@
+ #ifndef UI_EVENTS_GESTURE_EVENT_DETAILS_H_
+ #define UI_EVENTS_GESTURE_EVENT_DETAILS_H_
+ 
++#include <cstdint>
+ #include <string.h>
+ 
+ #include "base/check_op.h"
+diff --git a/src/3rdparty/chromium/ui/gfx/geometry/linear_gradient.h b/src/3rdparty/chromium/ui/gfx/geometry/linear_gradient.h
+index d32766283..18b8a85e1 100644
+--- a/src/3rdparty/chromium/ui/gfx/geometry/linear_gradient.h
++++ b/src/3rdparty/chromium/ui/gfx/geometry/linear_gradient.h
+@@ -7,6 +7,7 @@
+ 
+ #include <stdint.h>
+ 
++#include <cstdint>
+ #include <array>
+ #include <cstddef>
+ #include <cstdint>
+diff --git a/src/3rdparty/chromium/v8/src/base/macros.h b/src/3rdparty/chromium/v8/src/base/macros.h
+index f81258363..ec7d67550 100644
+--- a/src/3rdparty/chromium/v8/src/base/macros.h
++++ b/src/3rdparty/chromium/v8/src/base/macros.h
+@@ -5,6 +5,7 @@
+ #ifndef V8_BASE_MACROS_H_
+ #define V8_BASE_MACROS_H_
+ 
++#include <cstdint>
+ #include <limits>
+ #include <type_traits>
+ 
+diff --git a/src/core/browsing_data_remover_delegate_qt.h b/src/core/browsing_data_remover_delegate_qt.h
+index d33af4acb..ce864b6bd 100644
+--- a/src/core/browsing_data_remover_delegate_qt.h
++++ b/src/core/browsing_data_remover_delegate_qt.h
+@@ -8,6 +8,8 @@
+ 
+ #include "content/public/browser/browsing_data_remover_delegate.h"
+ 
++#include <cstdint>
++
+ namespace QtWebEngineCore {
+ 
+ class BrowsingDataRemoverDelegateQt : public content::BrowsingDataRemoverDelegate {
