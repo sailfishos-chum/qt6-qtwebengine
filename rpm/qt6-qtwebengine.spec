@@ -1,4 +1,7 @@
+%global qt_version 6.7.2
 
+# SFOS build requires newer linux kernel headers
+# available from https://build.sailfishos.org/package/show/nemo:devel:hw:native-common/kernel-headers
 
 %global _hardened_build 1
 
@@ -6,13 +9,8 @@
 %undefine _package_note_file
 
 %global use_system_libwebp 1
-%global use_system_jsoncpp 1
-%global use_system_libicu 1
-
-#%if 0%{?fedora} && 0%{?fedora} >= 39
-## Bundled python-six is too old to work with Python 3.12+
-#%global use_system_py_six 1
-#%endif
+%global use_system_jsoncpp 0
+%global use_system_libicu 0
 
 %global use_system_re2 0
 
@@ -64,7 +62,7 @@ Source0: %{name}-%{version}.tar.bz2
 Source10: macros.qt6-qtwebengine
 
 # pulseaudio headers
-Source20: pulseaudio-12.2-headers.tar.gz
+#Source20: pulseaudio-12.2-headers.tar.gz
 
 # workaround FTBFS against kernel-headers-5.2.0+
 Patch1:  qtwebengine-SIOCGSTAMP.patch
@@ -78,12 +76,15 @@ Patch50: qtwebengine-fix-build.patch
 
 ## Upstream patches:
 # Fixes build with FFmpeg 7
-Patch80:  qtwebengine-fix-building-with-system-ffmpeg.patch
+# Patch80:  qtwebengine-fix-building-with-system-ffmpeg.patch
 
-## Upstreamable patches:
-Patch110: qtwebengine-webrtc-system-openh264.patch
-Patch111: qtwebengine-blink-system-openh264.patch
-Patch112: qtwebengine-media-system-openh264.patch
+# ## Upstreamable patches:
+# Patch110: qtwebengine-webrtc-system-openh264.patch
+# Patch111: qtwebengine-blink-system-openh264.patch
+# Patch112: qtwebengine-media-system-openh264.patch
+
+# SFOS patches
+Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
 
 # handled by qt6-srpm-macros, which defines %%qt6_qtwebengine_arches
 # FIXME use/update qt6_qtwebengine_arches
@@ -118,7 +119,9 @@ BuildRequires: flex
 BuildRequires: libstdc++-static
 BuildRequires: git-core
 BuildRequires: gperf
-BuildRequires: krb5-devel
+BuildRequires: cups-devel
+BuildRequires: linux-glibc-devel
+#BuildRequires: krb5-devel
 %if 0%{?use_system_libicu}
 BuildRequires: libicu-devel >= 68
 %endif
@@ -135,25 +138,25 @@ Provides: bundled(minizip) = 2.8.1
 BuildRequires: pkgconfig(alsa)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(egl)
-BuildRequires: pkgconfig(epoxy)
+#BuildRequires: pkgconfig(epoxy)
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(freetype2)
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(gio-2.0)
-BuildRequires: pkgconfig(gl)
+#BuildRequires: pkgconfig(gl)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gobject-2.0)
 BuildRequires: pkgconfig(harfbuzz)
 %if 0%{?use_system_jsoncpp}
 BuildRequires: pkgconfig(jsoncpp)
 %endif
-BuildRequires: pkgconfig(lcms2)
+#BuildRequires: pkgconfig(lcms2)
 BuildRequires: pkgconfig(libcap)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(libevent)
-BuildRequires: pkgconfig(libpci)
-BuildRequires: pkgconfig(libpipewire-0.3)
+#BuildRequires: pkgconfig(libpci)
+#BuildRequires: pkgconfig(libpipewire-0.3)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libpulse)
 BuildRequires: pkgconfig(libudev)
@@ -163,32 +166,32 @@ BuildRequires: pkgconfig(libwebp) >= 0.6.0
 BuildRequires: pkgconfig(nss)
 BuildRequires: pkgconfig(opus)
 BuildRequires: pkgconfig(poppler-cpp)
-BuildRequires: pkgconfig(x11)
-BuildRequires: pkgconfig(xcomposite)
-BuildRequires: pkgconfig(xcursor)
-BuildRequires: pkgconfig(xdamage)
-BuildRequires: pkgconfig(xext)
-BuildRequires: pkgconfig(xfixes)
-BuildRequires: pkgconfig(xi)
+# BuildRequires: pkgconfig(x11)
+# BuildRequires: pkgconfig(xcomposite)
+# BuildRequires: pkgconfig(xcursor)
+# BuildRequires: pkgconfig(xdamage)
+# BuildRequires: pkgconfig(xext)
+# BuildRequires: pkgconfig(xfixes)
+# BuildRequires: pkgconfig(xi)
 BuildRequires: pkgconfig(xkbcommon)
-BuildRequires: pkgconfig(xkbfile)
-BuildRequires: pkgconfig(xrandr)
-BuildRequires: pkgconfig(xrender)
-BuildRequires: pkgconfig(xscrnsaver)
-BuildRequires: pkgconfig(xshmfence)
-BuildRequires: pkgconfig(xtst)
+# BuildRequires: pkgconfig(xkbfile)
+# BuildRequires: pkgconfig(xrandr)
+# BuildRequires: pkgconfig(xrender)
+# BuildRequires: pkgconfig(xscrnsaver)
+# BuildRequires: pkgconfig(xshmfence)
+# BuildRequires: pkgconfig(xtst)
 BuildRequires: pkgconfig(zlib)
 ## https://bugreports.qt.io/browse/QTBUG-59094
 ## requires libxml2 built with icu support
 #BuildRequires: pkgconfig(libxslt) pkgconfig(libxml-2.0)
-BuildRequires: perl-interpreter
-BuildRequires: python3
+BuildRequires: perl
+BuildRequires: python3-base
 BuildRequires: python3-html5lib
 BuildRequires: pkgconfig(vpx) >= 1.8.0
 BuildRequires: pkgconfig(libavcodec)
 BuildRequires: pkgconfig(libavformat)
 BuildRequires: pkgconfig(libavutil)
-BuildRequires: pkgconfig(openh264)
+#BuildRequires: pkgconfig(openh264)
 
 %if 0%{?fedora} && 0%{?fedora} >= 39
 BuildRequires: python3-zombie-imp
@@ -359,28 +362,29 @@ Summary: Example files for qt6-qtpdf
 %{summary}.
 
 %prep
-%setup -q -n %{name}-%{version}/upstream -a20
+%setup -q -n %{name}-%{version}/upstream
 
-mv pulse src/3rdparty/chromium/
+#mv pulse src/3rdparty/chromium/
 
 pushd src/3rdparty/chromium
+%patch1001 -p2
 popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
-%patch -P2 -p1 -b .link-pipewire
+# %patch -P2 -p1 -b .link-pipewire
 %patch -P3 -p1 -b .aarch64-new-stat
 
 %patch -P50 -p1 -b .fix-build.patch
 
-## upstream patches
-%if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
-%patch -P80 -p1 -b .fix-building-with-system-ffmpeg
-%endif
+# ## upstream patches
+# %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
+# %patch -P80 -p1 -b .fix-building-with-system-ffmpeg
+# %endif
 
-## upstreamable patches
-%patch -P110 -p1 -b .webrtc-system-openh264
-%patch -P111 -p1 -b .blink-system-openh264
-%patch -P112 -p1 -b .media-system-openh264
+# ## upstreamable patches
+# %patch -P110 -p1 -b .webrtc-system-openh264
+# %patch -P111 -p1 -b .blink-system-openh264
+# %patch -P112 -p1 -b .media-system-openh264
 
 # delete all "toolprefix = " lines from build/toolchain/linux/BUILD.gn, as we
 # never cross-compile in native Fedora RPMs, fixes ARM and aarch64 FTBFS
@@ -428,20 +432,10 @@ export NINJA_PATH=%{__ninja}
 %cmake_qt6 \
   -DCMAKE_TOOLCHAIN_FILE:STRING="%{_libdir}/cmake/Qt6/qt.toolchain.cmake" \
   -DFEATURE_qtpdf_build:BOOL=ON \
-  -DFEATURE_webengine_developer_build:BOOL=OFF \
-  -DFEATURE_webengine_embedded_build:BOOL=OFF \
-  -DFEATURE_webengine_extensions:BOOL=ON \
-  -DFEATURE_webengine_kerberos:BOOL=ON \
-  -DFEATURE_webengine_native_spellchecker:BOOL=OFF \
-  -DFEATURE_webengine_printing_and_pdf:BOOL=ON \
-  -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
   -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
-  -DFEATURE_webengine_system_libevent:BOOL=ON \
-  -DFEATURE_webengine_system_ffmpeg:BOOL=ON \
-  -DFEATURE_webengine_webrtc:BOOL=ON \
-  -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
-  -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF} \
-  -DQT_INSTALL_EXAMPLES_SOURCES=%{?examples:ON}%{!?examples:OFF}
+  -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
+  -DQT_BUILD_EXAMPLES:BOOL=OFF \
+  -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
 %cmake_build
 
@@ -663,86 +657,3 @@ done
 %{_qt6_examplesdir}/pdf*
 %endif
 
-%changelog
-* Mon Sep 23 2024 Fabio Valentini <decathorpe@gmail.com> - 6.7.2-4
-- Rebuild for ffmpeg 7
-
-* Mon Aug 05 2024 Jan Grulich <jgrulich@redhat.com> - 6.7.2-3
-- Fix building with system ffmpeg
-
-* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.2-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Tue Jul 02 2024 Jan Grulich <jgrulich@redhat.com> - 6.7.2-1
-- 6.7.2
-
-* Wed May 22 2024 Jan Grulich <jgrulich@redhat.com> - 6.7.1-1
-- 6.7.1
-
-* Wed Apr 24 2024 Jan Grulich <jgrulich@redhat.com> - 6.7.0-2
-- Rework and enable openh264 patches
-
-* Wed Apr 03 2024 Jan Grulich <jgrulich@redhat.com> - 6.7.0-1
-- 6.7.0
-
-* Sun Mar 3 2024 Marie Loise Nolden <loise@kde.org> - 6.6.2-3
-- move qt designer plugin to -devel 
-- remove old doc package code (docs are in qt6-doc)
-
-* Mon Feb 19 2024 Jan Grulich <jgrulich@redhat.com> - 6.6.2-2
-- Examples: also install source files
-
-* Thu Feb 15 2024 Jan Grulich <jgrulich@redhat.com> - 6.6.2-1
-- 6.6.2
-
-* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.6.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Tue Nov 28 2023 Jan Grulich <jgrulich@redhat.com> - 6.6.1-1
-- 6.6.1
-
-* Fri Oct 27 2023 Jan Grulich <jgrulich@redhat.com> - 6.6.0-2
-- Move v8_context_snapshot file to correct subpackage
-
-* Wed Oct 11 2023 Jan Grulich <jgrulich@redhat.com> - 6.6.0-1
-- 6.6.0
-
-* Sun Oct 01 2023 Justin Zobel <justin.zobel@gmail.com> - 6.5.3-1
-- new version
-
-* Tue Sep 05 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 6.5.2-2
-- Separate qtpdf subpackages
-
-* Mon Jul 24 2023 Jan Grulich <jgrulich@redhat.com> - 6.5.2-1
-- 6.5.2
-
-* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.5.1-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jul 13 2023 František Zatloukal <fzatlouk@redhat.com> - 6.5.1-3
-- Python 3.12 Fixes
-
-* Tue Jul 11 2023 František Zatloukal <fzatlouk@redhat.com> - 6.5.1-2
-- Rebuilt for ICU 73.2
-
-* Thu May 25 2023 Jan Grulich <jgrulich@redhat.com> - 6.5.1-1
-- 6.5.1
-
-* Tue Apr 04 2023 Jan Grulich <jgrulich@redhat.com> - 6.5.0-1
-- 6.5.0
-
-* Fri Mar 24 2023 Jan Grulich <jgrulich@redhat.com> - 6.4.3-1
-- 6.4.3
-
-* Sun Mar 12 2023 Neal Gompa <ngompa@fedoraproject.org> - 6.4.2-4
-- Rebuild for ffmpeg 6.0
-
-* Sat Feb 25 2023 Marek Kasik <mkasik@redhat.com> - 6.4.2-3
-- Rebuild for freetype-2.13.0
-
-* Wed Feb 15 2023 Tom Callaway <spot@fedoraproject.org> - 6.4.2-2
-- rebuild for libvpx
-
-* Mon Jan 16 2023 Jan Grulich <jgrulich@redhat.com> - 6.4.2-1
-
-- Initial package

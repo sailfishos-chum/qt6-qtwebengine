@@ -1,0 +1,35 @@
+From 267e8cca3af7d9c39803e00fb370a2a3c3428772 Mon Sep 17 00:00:00 2001
+From: Rinigus <rinigus.git@gmail.com>
+Date: Mon, 7 Oct 2024 22:14:25 +0300
+Subject: [PATCH] Fix build on SFOS: Comment out GL includes
+
+---
+ chromium/tools/v8_context_snapshot/qt_overrides.cc | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/chromium/tools/v8_context_snapshot/qt_overrides.cc b/chromium/tools/v8_context_snapshot/qt_overrides.cc
+index 6219290b686..157e3cdc826 100644
+--- a/chromium/tools/v8_context_snapshot/qt_overrides.cc
++++ b/chromium/tools/v8_context_snapshot/qt_overrides.cc
+@@ -5,12 +5,12 @@
+ #include "build/build_config.h"
+ #include "gpu/vulkan/buildflags.h"
+ 
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+-#include "ui/gl/gl_bindings.h"
+-#include "ui/gl/gl_context.h"
+-#include "ui/gl/gl_display.h"
+-#include "ui/gl/gl_surface.h"
+-#endif
++// #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
++// #include "ui/gl/gl_bindings.h"
++// #include "ui/gl/gl_context.h"
++// #include "ui/gl/gl_display.h"
++// #include "ui/gl/gl_surface.h"
++// #endif
+ 
+ #if BUILDFLAG(IS_LINUX)
+ #if BUILDFLAG(IS_OZONE)
+-- 
+2.45.2
+
