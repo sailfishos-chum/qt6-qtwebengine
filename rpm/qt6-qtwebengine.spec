@@ -3,6 +3,8 @@
 # SFOS build requires newer linux kernel headers
 # available from https://build.sailfishos.org/package/show/nemo:devel:hw:native-common/kernel-headers
 
+%bcond_with pipewire
+
 %global _hardened_build 1
 
 # package-notes causes FTBFS (#2043178)
@@ -161,7 +163,9 @@ BuildRequires: pkgconfig(libcap)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(libevent)
 #BuildRequires: pkgconfig(libpci)
-#BuildRequires: pkgconfig(libpipewire-0.3)
+%if %{with pipewire}
+BuildRequires: pkgconfig(libpipewire-0.3)
+%endif
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(libpulse)
 BuildRequires: pkgconfig(libudev)
@@ -381,7 +385,9 @@ pushd src/3rdparty/chromium
 popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
-# %%patch -P2 -p1 -b .link-pipewire
+%if %{with pipewire}
+%patch -P2 -p1 -b .link-pipewire
+%endif
 %patch -P3 -p1 -b .aarch64-new-stat
 
 %patch -P50 -p1 -b .fix-build.patch
@@ -473,9 +479,14 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_system_libevent:BOOL=ON \
   -DFEATURE_webengine_system_ffmpeg:BOOL=ON \
   -DFEATURE_webengine_webrtc:BOOL=ON \
+%if %{with pipewire}
   -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
+%else
+  -DFEATURE_webengine_webrtc_pipewire:BOOL=OFF \
+%endif
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
-  -DQT_INSTALL_EXAMPLES_SOURCES=OFF
+  -DQT_INSTALL_EXAMPLES_SOURCES=OFF \
+  %{nil}
 
 %cmake_build
 
