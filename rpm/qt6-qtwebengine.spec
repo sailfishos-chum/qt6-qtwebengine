@@ -8,6 +8,8 @@
 # package-notes causes FTBFS (#2043178)
 %undefine _package_note_file
 
+%global use_system_libxslt 1
+%global use_system_libxml 1
 %global use_system_libwebp 1
 %global use_system_jsoncpp 0
 %global use_system_libicu 0
@@ -45,7 +47,7 @@
 Summary: Qt6 - QtWebEngine components
 Name:    qt6-qtwebengine
 Version: 6.8.3
-Release: 4%{?dist}
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 # See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
@@ -65,23 +67,27 @@ Source10: macros.qt6-qtwebengine
 #Source20: pulseaudio-12.2-headers.tar.gz
 
 # workaround FTBFS against kernel-headers-5.2.0+
-Patch1:  qtwebengine-SIOCGSTAMP.patch
-Patch2:  qtwebengine-link-pipewire.patch
+Patch1:   qtwebengine-SIOCGSTAMP.patch
+Patch2:   qtwebengine-link-pipewire.patch
 # Fix/workaround FTBFS on aarch64 with newer glibc
-Patch3: qtwebengine-aarch64-new-stat.patch
+Patch3:   qtwebengine-aarch64-new-stat.patch
+
+# Enable OpenH264
+#Patch4:   qtwebengine-use-openh264.patch
 
 # FTBS warning: elaborated-type-specifier for a scoped enum must not
 # use the 'class' keyword
 Patch50: qtwebengine-fix-build.patch
 
 ## Upstream patches:
-# Fixes build with FFmpeg 7
-# Patch80:  qtwebengine-fix-building-with-system-ffmpeg.patch
+# https://bugreports.qt.io/browse/QTBUG-129985
+Patch80:  qtwebengine-fix-arm-build.patch
 
-# ## Upstreamable patches:
-# Patch110: qtwebengine-webrtc-system-openh264.patch
-# Patch111: qtwebengine-blink-system-openh264.patch
-# Patch112: qtwebengine-media-system-openh264.patch
+## Upstreamable patches:
+
+## ppc64le port
+#Patch200: qtwebengine-6.7-ppc64.patch
+#Patch201: qtwebengine-chromium-ppc64.patch
 
 # SFOS patches
 Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
@@ -105,22 +111,21 @@ BuildRequires: qt6-qtsvg-devel
 BuildRequires: qt6-qttools-static
 BuildRequires: qt6-qtquickcontrols2-devel
 BuildRequires: qt6-qtwebchannel-devel
+BuildRequires: qt6-qtwebsockets-devel
 # for examples?
 BuildRequires: ninja
 BuildRequires: cmake
 BuildRequires: bison
 BuildRequires: flex
 # BuildRequires: gcc-c++
-# %if 0%{?rhel} && 0%{?rhel} < 10
+# %%if 0%%{?rhel} && 0%%{?rhel} < 10
 # BuildRequires: gcc-toolset-13
 # BuildRequires: gcc-toolset-13-libatomic-devel
-# %endif
+# %%endif
 # gn links statically (for now)
 BuildRequires: libstdc++-static
 BuildRequires: git-core
 BuildRequires: gperf
-BuildRequires: cups-devel
-BuildRequires: linux-glibc-devel
 #BuildRequires: krb5-devel
 %if 0%{?use_system_libicu}
 BuildRequires: libicu-devel >= 68
@@ -192,6 +197,7 @@ BuildRequires: pkgconfig(libavcodec)
 BuildRequires: pkgconfig(libavformat)
 BuildRequires: pkgconfig(libavutil)
 #BuildRequires: pkgconfig(openh264)
+#BuildRequires: pkgconfig(libva)
 
 %if 0%{?fedora} && 0%{?fedora} >= 39
 BuildRequires: python3-zombie-imp
@@ -255,11 +261,15 @@ Provides: bundled(leveldb) = 1.23
 Provides: bundled(libjingle)
 # see src/3rdparty/chromium/third_party/libsrtp/CHANGES for the version number
 Provides: bundled(libsrtp) = 2.4.0
+%if ! %{?use_system_libxml}
 # bundled as "libxml"
 # see src/3rdparty/chromium/third_party/libxml/linux/include/libxml/xmlversion.h
 Provides: bundled(libxml2) = 2.9.13
+%endif
+%if ! %{?use_system_libxslt}
 # see src/3rdparty/chromium/third_party/libxslt/linux/config.h for version
 Provides: bundled(libxslt) = 1.1.3
+%endif
 Provides: bundled(libyuv) = 1819
 Provides: bundled(modp_b64)
 Provides: bundled(ots)
@@ -371,20 +381,26 @@ pushd src/3rdparty/chromium
 popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
-# %patch -P2 -p1 -b .link-pipewire
+# %%patch -P2 -p1 -b .link-pipewire
 %patch -P3 -p1 -b .aarch64-new-stat
 
 %patch -P50 -p1 -b .fix-build.patch
 
-# ## upstream patches
-# %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
-# %patch -P80 -p1 -b .fix-building-with-system-ffmpeg
-# %endif
+## upstream patches
+%patch -P80 -p1 -b .fix-arm-build
+
+## upstreamable patches
+
+# ppc64le support
+# %%patch -P200 -p1
+# pushd src/3rdparty/chromium
+# %%patch -P201 -p1
+# popd
 
 # ## upstreamable patches
-# %patch -P110 -p1 -b .webrtc-system-openh264
-# %patch -P111 -p1 -b .blink-system-openh264
-# %patch -P112 -p1 -b .media-system-openh264
+# %%patch -P110 -p1 -b .webrtc-system-openh264
+# %%patch -P111 -p1 -b .blink-system-openh264
+# %%patch -P112 -p1 -b .media-system-openh264
 
 # delete all "toolprefix = " lines from build/toolchain/linux/BUILD.gn, as we
 # never cross-compile in native Fedora RPMs, fixes ARM and aarch64 FTBFS
@@ -410,6 +426,20 @@ cp -bv /usr/include/re2/*.h src/3rdparty/chromium/third_party/re2/src/re2/
 # copy the Chromium license so it is installed with the appropriate name
 cp -p src/3rdparty/chromium/LICENSE LICENSE.Chromium
 
+
+# use system libraries
+system_libs=()
+%if %{?use_system_libxml}
+    system_libs+=(libxml)
+%endif
+%if %{?use_system_libxslt}
+    system_libs+=(libxslt)
+%endif
+#system_libs+=(openh264)
+
+# Use system OpenH264
+#src/3rdparty/chromium/build/linux/unbundle/replace_gn_files.py --system-libraries ${system_libs[@]}
+
 # consider doing this as part of the tarball creation step instead?  rdieter
 # fix/workaround
 # fatal error: QtWebEngineCore/qtwebenginecoreglobal.h: No such file or directory
@@ -432,8 +462,18 @@ export NINJA_PATH=%{__ninja}
 %cmake_qt6 \
   -DCMAKE_TOOLCHAIN_FILE:STRING="%{_libdir}/cmake/Qt6/qt.toolchain.cmake" \
   -DFEATURE_qtpdf_build:BOOL=ON \
-  -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
+  -DFEATURE_webengine_developer_build:BOOL=OFF \
+  -DFEATURE_webengine_embedded_build:BOOL=OFF \
+  -DFEATURE_webengine_extensions:BOOL=ON \
+  -DFEATURE_webengine_kerberos:BOOL=OFF \
+  -DFEATURE_webengine_native_spellchecker:BOOL=OFF \
+  -DFEATURE_webengine_printing_and_pdf:BOOL=ON \
   -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
+  -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
+  -DFEATURE_webengine_system_libevent:BOOL=ON \
+  -DFEATURE_webengine_system_ffmpeg:BOOL=ON \
+  -DFEATURE_webengine_webrtc:BOOL=ON \
+  -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
   -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
@@ -493,6 +533,8 @@ done
 
 %files
 %license LICENSE.*
+#%%{_qt6_archdatadir}/sbom/%%{qt_module}-%%{version}.spdx
+#%%{_qt6_archdatadir}/sbom/qtpdf-%%{version}.spdx
 %{_qt6_libdir}/libQt6WebEngineCore.so.*
 %{_qt6_libdir}/libQt6WebEngineQuick.so.*
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.so.*
