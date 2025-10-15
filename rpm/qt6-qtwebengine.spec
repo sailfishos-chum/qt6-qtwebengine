@@ -477,7 +477,7 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
   -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
   -DFEATURE_webengine_system_libevent:BOOL=ON \
-  -DFEATURE_webengine_system_ffmpeg:BOOL=ON \
+  -DFEATURE_webengine_system_ffmpeg:BOOL=OFF \
   -DFEATURE_webengine_webrtc:BOOL=ON \
 %if %{with pipewire}
   -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
