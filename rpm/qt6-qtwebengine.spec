@@ -145,7 +145,7 @@ Provides: bundled(minizip) = 2.8.1
 BuildRequires: pkgconfig(alsa)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(egl)
-#BuildRequires: pkgconfig(epoxy)
+BuildRequires: pkgconfig(epoxy)
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(fontconfig)
 BuildRequires: pkgconfig(freetype2)
