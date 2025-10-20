@@ -153,7 +153,9 @@ BuildRequires: gcc-c++
 BuildRequires: libstdc++-static
 BuildRequires: libatomic
 
-BuildRequires: %{__python3}
+#BuildRequires: %%{__python3}
+BuildRequires: python3-base
+BuildRequires: python3-rpm-macros
 BuildRequires: python3-html5lib
 BuildRequires: gperf
 BuildRequires: bison
@@ -197,10 +199,13 @@ BuildRequires: pkgconfig(libwebp) >= 0.6.0
 BuildRequires: pkgconfig(opus) >= 1.3.1
 %endif
 %if %{?use_system_ffmpeg}
-BuildRequires: pkgconfig(libavutil) >= 58.29.100
-BuildRequires: pkgconfig(libavcodec) >= 60.31.102
-BuildRequires: pkgconfig(libavformat) >= 60.16.100
-BuildRequires: pkgconfig(openh264)
+#BuildRequires: pkgconfig(libavutil) >= 58.29.100
+#BuildRequires: pkgconfig(libavcodec) >= 60.31.102
+#BuildRequires: pkgconfig(libavformat) >= 60.16.100
+#BuildRequires: pkgconfig(openh264)
+BuildRequires: pkgconfig(libavutil)
+BuildRequires: pkgconfig(libavcodec)
+BuildRequires: pkgconfig(libavformat)
 %endif
 %if %{?use_system_libvpx}
 BuildRequires: pkgconfig(vpx) >= 1.10.0
