@@ -605,7 +605,7 @@ export NINJA_PATH=%{__ninja}
 %endif
   -DFEATURE_webengine_geolocation:BOOL=ON \
   -DFEATURE_webengine_webchannel:BOOL=ON \
-  -DFEATURE_webengine_kerberos:BOOL=ON \
+  -DFEATURE_webengine_kerberos:BOOL=OFF \
   -DFEATURE_webengine_extensions:BOOL=ON \
   -DFEATURE_webengine_ozone_x11:BOOL=OFF \
 %if %{with vulkan}
