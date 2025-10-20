@@ -616,7 +616,7 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_system_gbm:BOOL=ON \
   -DFEATURE_webengine_v8_context_snapshot:BOOL=ON \
   -DFEATURE_webenginedriver:BOOL=ON \
-  -DFEATURE_pdf_v8:BOOL=%{?enable_pdf_v8} \
+  -DFEATURE_pdf_v8:BOOL=ON \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
   -DQT_INSTALL_EXAMPLES_SOURCES=OFF \
   %{nil}
