@@ -32,7 +32,7 @@
 %global use_system_libopenjpeg2 1
 %global use_system_harfbuzz 1
 %global use_system_freetype 1
-%global use_system_libpci 1
+%global use_system_libpci 0
 %global use_system_libudev 1
 
 %if 0%{?rhel} && 0%{?rhel} == 9
@@ -160,7 +160,8 @@ BuildRequires: python3-html5lib
 BuildRequires: gperf
 BuildRequires: bison
 BuildRequires: flex
-BuildRequires: perl-interpreter
+#BuildRequires: perl-interpreter
+BuildRequires: perl
 
 BuildRequires: nodejs >= 14.9
 #BuildRequires: krb5-devel
