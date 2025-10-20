@@ -16,7 +16,7 @@
 %global use_system_libicu 1
 %global use_system_libwebp 1
 %global use_system_opus 1
-%global use_system_ffmpeg 1
+%global use_system_ffmpeg 0
 # libvpx is exclusive with VA-API support (libva) which is enabled by default
 %global use_system_libvpx 0
 %global use_system_snappy 1
