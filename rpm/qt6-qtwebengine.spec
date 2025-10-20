@@ -4,6 +4,7 @@
 # available from https://build.sailfishos.org/package/show/nemo:devel:hw:native-common/kernel-headers
 
 %bcond_with pipewire
+%bcond_with vulkan
 
 %global _hardened_build 1
 
@@ -163,6 +164,9 @@ BuildRequires: pkgconfig(libcap)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(libevent)
 #BuildRequires: pkgconfig(libpci)
+%if %{with vulkan}
+BuildRequires: vulkan-headers
+%endif
 %if %{with pipewire}
 BuildRequires: pkgconfig(libpipewire-0.3)
 %endif
@@ -479,6 +483,9 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_system_libevent:BOOL=ON \
   -DFEATURE_webengine_system_ffmpeg:BOOL=OFF \
   -DFEATURE_webengine_webrtc:BOOL=ON \
+%if %{with vulkan}
+  -DFEATURE_webengine_vulkan:BOOL=ON \
+%endif
 %if %{with pipewire}
   -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
 %else
