@@ -594,8 +594,8 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_embedded_build:BOOL=OFF \
   -DFEATURE_webengine_pepper_plugins:BOOL=OFF \
   -DFEATURE_webengine_printing_and_pdf:BOOL=OFF \
-  -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
-  -DFEATURE_webengine_spellchecker:BOOL=ON \
+  -DFEATURE_webengine_proprietary_codecs:BOOL=OFF \
+  -DFEATURE_webengine_spellchecker:BOOL=OFF \
   -DFEATURE_webengine_native_spellchecker:BOOL=OFF \
   -DFEATURE_webengine_webrtc:BOOL=ON \
 %if %{with pipewire}
