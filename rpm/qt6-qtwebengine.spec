@@ -371,9 +371,9 @@ Summary: Example files for qt6-qtpdf
 
 #mv pulse src/3rdparty/chromium/
 
-pushd src/3rdparty/chromium
-%patch1001 -p2
-popd
+#pushd src/3rdparty/chromium
+#%patch1001 -p2
+#popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
 # %patch -P2 -p1 -b .link-pipewire
