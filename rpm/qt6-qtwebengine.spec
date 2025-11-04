@@ -3,60 +3,16 @@
 # SFOS build requires newer linux kernel headers
 # available from https://build.sailfishos.org/package/show/nemo:devel:hw:native-common/kernel-headers
 
-%bcond_with pipewire
-%bcond_with vulkan
-
 %global _hardened_build 1
 
 # package-notes causes FTBFS (#2043178)
 %undefine _package_note_file
 
-# defines for Optional system libraries:
-%global use_system_re2 0
-%global use_system_libicu 1
 %global use_system_libwebp 1
-%global use_system_opus 1
-%global use_system_ffmpeg 0
-# libvpx is exclusive with VA-API support (libva) which is enabled by default
-%global use_system_libvpx 0
-%global use_system_snappy 1
-%global use_system_glib 1
-%global use_system_zlib 1
-%global use_system_minizip 1
-%global use_system_libevent 1
-%global use_system_libxml 1
-%global use_system_lcms2 0
-%global use_system_libpng 1
-%global use_system_libtiff 1
-%global use_system_libjpeg 1
-%global use_system_libopenjpeg2 1
-%global use_system_harfbuzz 1
-%global use_system_freetype 1
-%global use_system_libpci 0
-%global use_system_libudev 1
-
-%if 0%{?rhel} && 0%{?rhel} == 9
-%global use_system_re2 0
+%global use_system_jsoncpp 0
 %global use_system_libicu 0
-%global use_system_minizip 0
-%global use_system_harfbuzz 0
-%endif
 
-%if 0%{?rhel} && 0%{?rhel} == 10
-%global use_system_zlib 0
-%endif
-
-## ppc64le builds currently fail with V8/XFA enabled (qt 6.9.0)
-#%%ifarch ppc64le
-#%%global enable_pdf_v8 0
-#%%else
-#%%global enable_pdf_v8 1
-#%%endif
-
-%if 0%{?fedora} && 0%{?fedora} >= 39
-# Bundled python-six is too old to work with Python 3.12+
-%global use_system_py_six 1
-%endif
+%global use_system_re2 0
 
 # NEON support on ARM (detected at runtime) - disable this if you are hitting
 # FTBFS due to e.g. GCC bug https://bugzilla.redhat.com/show_bug.cgi?id=1282495
@@ -74,6 +30,8 @@
 # webcore_debug v8base_debug
 %endif
 
+#global prerelease rc
+
 # spellchecking dictionary directory
 %global _qtwebengine_dictionaries_dir %{_qt6_datadir}/qtwebengine_dictionaries
 
@@ -82,14 +40,7 @@
 # and designer plugins
 %global __provides_exclude_from ^%{_qt6_plugindir}/.*\\.so$
 
-# FIXME: we cannot use any ~rc or similar suffix as the build
-# would fail for having too long filename
-#global unstable 1
-%if 0%{?unstable}
-%global prerelease rc
-%endif
-
-%global examples 0
+#global examples 1
 
 Summary: Qt6 - QtWebEngine components
 Name:    qt6-qtwebengine
@@ -119,21 +70,26 @@ Patch2:   qtwebengine-link-pipewire.patch
 # Fix/workaround FTBFS on aarch64 with newer glibc
 Patch3:   qtwebengine-aarch64-new-stat.patch
 
-# Enable OpenH264
-#Patch4:   qtwebengine-use-openh264.patch
+# FTBFS - /usr/include/bits/siginfo-consts.h:219:3: error: expected identifier
+# 219 |   SYS_SECCOMP = 1,              /* Seccomp triggered.  */
+Patch5:   qtwebengine-chromium-141-glibc-2.42-SYS_SECCOMP.patch
+
+
+# FTBS warning: elaborated-type-specifier for a scoped enum must not
+# use the 'class' keyword
+Patch50: qtwebengine-fix-build.patch
 
 ## Upstream patches:
-# https://bugreports.qt.io/browse/QTBUG-129985
-Patch80:  qtwebengine-fix-arm-build.patch
+# Fixes build with FFmpeg 7
+# Patch80:  qtwebengine-fix-building-with-system-ffmpeg.patch
 
-## Upstreamable patches:
-
-## ppc64le port
-#Patch200: qtwebengine-6.7-ppc64.patch
-#Patch201: qtwebengine-chromium-ppc64.patch
+# ## Upstreamable patches:
+# Patch110: qtwebengine-webrtc-system-openh264.patch
+# Patch111: qtwebengine-blink-system-openh264.patch
+# Patch112: qtwebengine-media-system-openh264.patch
 
 # SFOS patches
-#Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
+Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
 
 # handled by qt6-srpm-macros, which defines %%qt6_qtwebengine_arches
 # FIXME use/update qt6_qtwebengine_arches
@@ -142,36 +98,9 @@ ExclusiveArch: aarch64 x86_64
 
 BuildRequires: cmake
 BuildRequires: make
-#%%if 0%%{?rhel} && 0%%{?rhel} < 10
-#BuildRequires: gcc-toolset-13
-#BuildRequires: gcc-toolset-13-libatomic-devel
-#%%else
-BuildRequires: gcc-c++
-#%%endif
-
-# gn links statically (for now)
-BuildRequires: libstdc++-static
-BuildRequires: libatomic
-
-#BuildRequires: %%{__python3}
-BuildRequires: python3-base
-BuildRequires: python3-rpm-macros
-BuildRequires: python3-html5lib
-BuildRequires: gperf
-BuildRequires: bison
-BuildRequires: flex
-#BuildRequires: perl-interpreter
-BuildRequires: perl
-
-BuildRequires: nodejs >= 14.9
-#BuildRequires: krb5-devel
-BuildRequires: git-core
-
 BuildRequires: qt6-srpm-macros
 BuildRequires: qt6-qtbase-devel
 BuildRequires: qt6-qtbase-private-devel
-%{?_qt6_version:Requires: qt6-qtbase%{?_isa} = %{_qt6_version}}
-
 # TODO: check of = is really needed or if >= would be good enough -- rex
 %{?_qt6:Requires: %{_qt6}%{?_isa} = %{_qt6_version}}
 BuildRequires: qt6-qtdeclarative-devel
@@ -181,136 +110,93 @@ BuildRequires: qt6-qtsvg-devel
 BuildRequires: qt6-qttools-static
 BuildRequires: qt6-qtquickcontrols2-devel
 BuildRequires: qt6-qtwebchannel-devel
-BuildRequires: qt6-qtwebsockets-devel
-#BuildRequires: qt6-qthttpserver-devel
-
-# optional system libraries in the order of the -- Configure summary: listing
+# for examples?
+BuildRequires: ninja
+BuildRequires: cmake
+BuildRequires: bison
+BuildRequires: flex
+# BuildRequires: gcc-c++
+# %if 0%{?rhel} && 0%{?rhel} < 10
+# BuildRequires: gcc-toolset-13
+# BuildRequires: gcc-toolset-13-libatomic-devel
+# %endif
+# gn links statically (for now)
+BuildRequires: libstdc++-static
+BuildRequires: git-core
+BuildRequires: gperf
+BuildRequires: cups-devel
+BuildRequires: linux-glibc-devel
+#BuildRequires: krb5-devel
+%if 0%{?use_system_libicu}
+BuildRequires: libicu-devel >= 68
+%endif
+BuildRequires: libatomic
+BuildRequires: libjpeg-devel
+BuildRequires: nodejs
 %if 0%{?use_system_re2}
-BuildRequires: pkgconfig(re2) >= 11.0.0
-%else
+BuildRequires: re2-devel
 Provides: bundled(re2)
 %endif
-%if 0%{?use_system_libicu}
-BuildRequires: libicu-devel >= 70
+BuildRequires: snappy-devel
+BuildConflicts: minizip-devel
+Provides: bundled(minizip) = 2.8.1
+BuildRequires: pkgconfig(alsa)
+BuildRequires: pkgconfig(dbus-1)
+BuildRequires: pkgconfig(egl)
+#BuildRequires: pkgconfig(epoxy)
+BuildRequires: pkgconfig(expat)
+BuildRequires: pkgconfig(fontconfig)
+BuildRequires: pkgconfig(freetype2)
+BuildRequires: pkgconfig(gbm)
+BuildRequires: pkgconfig(gio-2.0)
+#BuildRequires: pkgconfig(gl)
+BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(gobject-2.0)
+BuildRequires: pkgconfig(harfbuzz)
+%if 0%{?use_system_jsoncpp}
+BuildRequires: pkgconfig(jsoncpp)
 %endif
+#BuildRequires: pkgconfig(lcms2)
+BuildRequires: pkgconfig(libcap)
+BuildRequires: pkgconfig(libdrm)
+BuildRequires: pkgconfig(libevent)
+#BuildRequires: pkgconfig(libpci)
+#BuildRequires: pkgconfig(libpipewire-0.3)
+BuildRequires: pkgconfig(libpng)
+BuildRequires: pkgconfig(libpulse)
+BuildRequires: pkgconfig(libudev)
 %if 0%{?use_system_libwebp}
 BuildRequires: pkgconfig(libwebp) >= 0.6.0
 %endif
-%if 0%{?use_system_opus}
-BuildRequires: pkgconfig(opus) >= 1.3.1
-%endif
-%if %{?use_system_ffmpeg}
-#BuildRequires: pkgconfig(libavutil) >= 58.29.100
-#BuildRequires: pkgconfig(libavcodec) >= 60.31.102
-#BuildRequires: pkgconfig(libavformat) >= 60.16.100
-#BuildRequires: pkgconfig(openh264)
-BuildRequires: pkgconfig(libavutil)
+BuildRequires: pkgconfig(nss)
+BuildRequires: pkgconfig(opus)
+BuildRequires: pkgconfig(poppler-cpp)
+# BuildRequires: pkgconfig(x11)
+# BuildRequires: pkgconfig(xcomposite)
+# BuildRequires: pkgconfig(xcursor)
+# BuildRequires: pkgconfig(xdamage)
+# BuildRequires: pkgconfig(xext)
+# BuildRequires: pkgconfig(xfixes)
+# BuildRequires: pkgconfig(xi)
+BuildRequires: pkgconfig(xkbcommon)
+# BuildRequires: pkgconfig(xkbfile)
+# BuildRequires: pkgconfig(xrandr)
+# BuildRequires: pkgconfig(xrender)
+# BuildRequires: pkgconfig(xscrnsaver)
+# BuildRequires: pkgconfig(xshmfence)
+# BuildRequires: pkgconfig(xtst)
+BuildRequires: pkgconfig(zlib)
+## https://bugreports.qt.io/browse/QTBUG-59094
+## requires libxml2 built with icu support
+#BuildRequires: pkgconfig(libxslt) pkgconfig(libxml-2.0)
+BuildRequires: perl
+BuildRequires: python3-base
+BuildRequires: python3-html5lib
+BuildRequires: pkgconfig(vpx) >= 1.8.0
 BuildRequires: pkgconfig(libavcodec)
 BuildRequires: pkgconfig(libavformat)
-%endif
-%if %{?use_system_libvpx}
-BuildRequires: pkgconfig(vpx) >= 1.10.0
-%endif
-%if 0%{?use_system_snappy}
-BuildRequires: pkgconfig(snappy)
-%endif
-%if 0%{?use_system_glib}
-BuildRequires: pkgconfig(glib-2.0)
-BuildRequires: pkgconfig(gobject-2.0)
-BuildRequires: pkgconfig(gio-2.0)
-%endif
-%if %{?use_system_zlib}
-BuildRequires: pkgconfig(zlib)
-%endif
-%if 0%{?use_system_minizip}
-BuildRequires: pkgconfig(minizip)
-%else
-Provides: bundled(minizip) = 2.8.1
-%endif
-%if 0%{?use_system_libevent}
-BuildRequires: pkgconfig(libevent)
-%endif
-%if %{?use_system_libxml}
-BuildRequires: pkgconfig(libxml-2.0)
-BuildRequires: pkgconfig(libxslt)
-%else
-# bundled as "libxml"
-# see src/3rdparty/chromium/third_party/libxml/linux/include/libxml/xmlversion.h
-Provides: bundled(libxml2) = 2.9.13
-# see src/3rdparty/chromium/third_party/libxslt/linux/config.h for version
-Provides: bundled(libxslt) = 1.1.3
-%endif
-%if 0%{?use_system_lcms2}
-BuildRequires: pkgconfig(lcms2)
-%endif
-%if 0%{?use_system_libpng}
-BuildRequires: pkgconfig(libpng) >= 1.6.0
-%endif
-%if 0%{?use_system_libtiff}
-BuildRequires: pkgconfig(libtiff-4) >= 4.2.0
-%endif
-%if 0%{?use_system_libjpeg}
-BuildRequires: pkgconfig(libjpeg)
-%endif
-%if 0%{?use_system_libopenjpeg2}
-BuildRequires: pkgconfig(libopenjp2)
-%endif
-%if 0%{?use_system_harfbuzz}
-BuildRequires: pkgconfig(harfbuzz) >= 4.3.0
-%endif
-%if 0%{?use_system_freetype}
-BuildRequires: pkgconfig(freetype2) >= 2.4.2
-BuildRequires: pkgconfig(fontconfig)
-%endif
-%if 0%{?use_system_libpci}
-BuildRequires: pkgconfig(libpci)
-%endif
-%if 0%{?use_system_libudev}
-BuildRequires: pkgconfig(libudev)
-%endif
-
-# qpa-xcb support libraries
-#BuildRequires: pkgconfig(x11)
-#BuildRequires: pkgconfig(libdrm)
-#BuildRequires: pkgconfig(xcomposite)
-#BuildRequires: pkgconfig(xcursor)
-#BuildRequires: pkgconfig(xrandr)
-#BuildRequires: pkgconfig(xi)
-#BuildRequires: pkgconfig(xproto)
-#BuildRequires: pkgconfig(xshmfence)
-#BuildRequires: pkgconfig(xtst)
-BuildRequires: pkgconfig(xkbcommon)
-#BuildRequires: pkgconfig(xkbfile)
-#BuildRequires: pkgconfig(xcb)
-
-# required for webrtc
-#BuildRequires: pkgconfig(xdamage)
-
-# required for alsa
-BuildRequires: pkgconfig(alsa)
-# required for pulseaudio
-BuildRequires: pkgconfig(libpulse)
-# required for vaapi
-BuildRequires: pkgconfig(libva)
-%if %{with pipewire}
-# required for pipewire
-BuildRequires: pkgconfig(libpipewire-0.3)
-%endif
-
-%if %{with vulkan}
-BuildRequires: vulkan-headers
-%endif
-
-BuildRequires: pkgconfig(dbus-1)
-BuildRequires: pkgconfig(egl)
-BuildRequires: pkgconfig(epoxy)
-BuildRequires: pkgconfig(expat)
-BuildRequires: pkgconfig(gbm)
-#BuildRequires: pkgconfig(gl)
-BuildRequires: pkgconfig(libcap)
-BuildRequires: pkgconfig(nss) >= 3.26
-BuildRequires: pkgconfig(poppler-cpp)
-
+BuildRequires: pkgconfig(libavutil)
+#BuildRequires: pkgconfig(openh264)
 
 %if 0%{?fedora} && 0%{?fedora} >= 39
 BuildRequires: python3-zombie-imp
@@ -374,9 +260,15 @@ Provides: bundled(leveldb) = 1.23
 Provides: bundled(libjingle)
 # see src/3rdparty/chromium/third_party/libsrtp/CHANGES for the version number
 Provides: bundled(libsrtp) = 2.4.0
+# bundled as "libxml"
+# see src/3rdparty/chromium/third_party/libxml/linux/include/libxml/xmlversion.h
+Provides: bundled(libxml2) = 2.9.13
+# see src/3rdparty/chromium/third_party/libxslt/linux/config.h for version
+Provides: bundled(libxslt) = 1.1.3
 Provides: bundled(libyuv) = 1819
 Provides: bundled(modp_b64)
 Provides: bundled(ots)
+Provides: bundled(re2)
 # see src/3rdparty/chromium/third_party/protobuf/CHANGES.txt for the version
 Provides: bundled(protobuf) = 3.13.0.1
 Provides: bundled(qcms) = 4
@@ -426,6 +318,8 @@ Provides: bundled(v8) = 11.8.172.18
 # http://www.netlib.org/fdlibm/readme
 Provides: bundled(fdlibm) = 5.3
 
+%{?_qt6_version:Requires: qt6-qtbase%{?_isa} = %{_qt6_version}}
+
 %description
 %{summary}.
 
@@ -468,7 +362,7 @@ Requires: qt6-qtdeclarative-devel%{?_isa}
 
 %package -n qt6-qtpdf-examples
 Summary: Example files for qt6-qtpdf
-Requires: qt6-qtsvg%{?_isa}
+
 %description -n qt6-qtpdf-examples
 %{summary}.
 
@@ -477,32 +371,27 @@ Requires: qt6-qtsvg%{?_isa}
 
 #mv pulse src/3rdparty/chromium/
 
-#pushd src/3rdparty/chromium
-#%%patch1001 -p2
-#popd
+pushd src/3rdparty/chromium
+%patch1001 -p2
+popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
-%if %{with pipewire}
-%patch -P2 -p1 -b .link-pipewire
-%endif
+# %patch -P2 -p1 -b .link-pipewire
 %patch -P3 -p1 -b .aarch64-new-stat
-#%%patch -P4 -p1 -b .use-openh264
+%patch -P5 -p1 -b .chromium-141-glibc-2.42-SYS_SECCOMP
 
-## upstream patches
-%patch -P80 -p1 -b .fix-arm-build
 
-## upstreamable patches
+%patch -P50 -p1 -b .fix-build.patch
 
-# ppc64le support
-# %%patch -P200 -p1
-# pushd src/3rdparty/chromium
-# %%patch -P201 -p1
-# popd
+# ## upstream patches
+# %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
+# %patch -P80 -p1 -b .fix-building-with-system-ffmpeg
+# %endif
 
 # ## upstreamable patches
-# %%patch -P110 -p1 -b .webrtc-system-openh264
-# %%patch -P111 -p1 -b .blink-system-openh264
-# %%patch -P112 -p1 -b .media-system-openh264
+# %patch -P110 -p1 -b .webrtc-system-openh264
+# %patch -P111 -p1 -b .blink-system-openh264
+# %patch -P112 -p1 -b .media-system-openh264
 
 # delete all "toolprefix = " lines from build/toolchain/linux/BUILD.gn, as we
 # never cross-compile in native Fedora RPMs, fixes ARM and aarch64 FTBFS
@@ -519,24 +408,14 @@ ln -s /usr/lib/python%{python3_version}/site-packages/six.py src/3rdparty/chromi
 ln -s /usr/lib/python%{python3_version}/site-packages/six.py src/3rdparty/chromium/third_party/wpt_tools/wpt/tools/third_party/six/six.py
 %endif
 
-#%%if 0%{?use_system_re2}
-## http://bugzilla.redhat.com/1337585
-## can't just delete, but we'll overwrite with system headers to be on the safe side
-#cp -bv /usr/include/re2/*.h src/3rdparty/chromium/third_party/re2/src/re2/
-#%%endif
+%if 0%{?use_system_re2}
+# http://bugzilla.redhat.com/1337585
+# can't just delete, but we'll overwrite with system headers to be on the safe side
+cp -bv /usr/include/re2/*.h src/3rdparty/chromium/third_party/re2/src/re2/
+%endif
 
 # copy the Chromium license so it is installed with the appropriate name
 cp -p src/3rdparty/chromium/LICENSE LICENSE.Chromium
-
-
-# use system libraries not handled by cmake options correctly
-system_libs=()
-%if %{?use_system_ffmpeg}
-system_libs+=(ffmpeg)
-#system_libs+=(openh264)
-%endif
-# Use system libraries
-#src/3rdparty/chromium/build/linux/unbundle/replace_gn_files.py --system-libraries ${system_libs[@]}
 
 # consider doing this as part of the tarball creation step instead?  rdieter
 # fix/workaround
@@ -557,69 +436,13 @@ export STRIP=strip
 export NINJAFLAGS="%{__ninja_common_opts}"
 export NINJA_PATH=%{__ninja}
 
-# this follows the logic of the Configure summary to turn on and off
 %cmake_qt6 \
   -DCMAKE_TOOLCHAIN_FILE:STRING="%{_libdir}/cmake/Qt6/qt.toolchain.cmake" \
-  -DFEATURE_webengine_build_gn:BOOL=ON \
-  -DFEATURE_webengine_jumbo_build:BOOL=ON \
-  -DFEATURE_webengine_developer_build:BOOL=OFF \
-  -DFEATURE_qtwebengine_build:BOOL=ON \
-  -DFEATURE_qtwebengine_core_build:BOOL=ON \
-  -DFEATURE_qtwebengine_widgets_build:BOOL=OFF \
-  -DFEATURE_qtwebengine_quick_build:BOOL=ON \
-  -DFEATURE_qtpdf_build:BOOL=OFF \
-  -DFEATURE_qtpdf_widgets_build:BOOL=OFF \
-  -DFEATURE_qtpdf_quick_build:BOOL=OFF \
-  -DFEATURE_webengine_system_re2:BOOL=%{?use_system_re2} \
+  -DFEATURE_qtpdf_build:BOOL=ON \
   -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
-  -DFEATURE_webengine_system_libwebp:BOOL=%{?use_system_libwebp} \
-  -DFEATURE_webengine_system_opus:BOOL=%{?use_system_opus} \
-  -DFEATURE_webengine_system_ffmpeg:BOOL=%{?use_system_ffmpeg} \
-  -DFEATURE_webengine_system_libvpx:BOOL=%{?use_system_libvpx} \
-  -DFEATURE_webengine_system_snappy:BOOL=%{?use_system_snappy} \
-  -DFEATURE_webengine_system_glib:BOOL=%{?use_system_glib} \
-  -DFEATURE_webengine_system_zlib:BOOL=%{?use_system_zlib} \
-  -DFEATURE_webengine_system_minizip:BOOL=%{?use_system_minizip} \
-  -DFEATURE_webengine_system_libevent:BOOL=%{?use_system_libevent} \
-  -DFEATURE_webengine_system_libxml:BOOL=%{?use_system_libxml} \
-  -DFEATURE_webengine_system_lcms2:BOOL=%{?use_system_lcms2} \
-  -DFEATURE_webengine_system_libpng:BOOL=%{?use_system_libpng} \
-  -DFEATURE_webengine_system_libtiff:BOOL=%{?use_system_libtiff} \
-  -DFEATURE_webengine_system_libjpeg:BOOL=%{?use_system_libjpeg} \
-  -DFEATURE_webengine_system_libopenjpeg2:BOOL=%{?use_system_libopenjpeg2} \
-  -DFEATURE_webengine_system_harfbuzz:BOOL=%{?use_system_harfbuzz} \
-  -DFEATURE_webengine_system_freetype:BOOL=%{?use_system_freetype} \
-  -DFEATURE_webengine_system_libpci:BOOL=%{?use_system_libpci} \
-  -DFEATURE_webengine_system_libudev:BOOL=%{?use_system_libudev} \
-  -DFEATURE_webengine_embedded_build:BOOL=OFF \
-  -DFEATURE_webengine_pepper_plugins:BOOL=OFF \
-  -DFEATURE_webengine_printing_and_pdf:BOOL=OFF \
-  -DFEATURE_webengine_proprietary_codecs:BOOL=OFF \
-  -DFEATURE_webengine_spellchecker:BOOL=OFF \
-  -DFEATURE_webengine_native_spellchecker:BOOL=OFF \
-  -DFEATURE_webengine_webrtc:BOOL=ON \
-%if %{with pipewire}
-  -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
-%else
-  -DFEATURE_webengine_webrtc_pipewire:BOOL=OFF \
-%endif
-  -DFEATURE_webengine_geolocation:BOOL=ON \
-  -DFEATURE_webengine_webchannel:BOOL=ON \
-  -DFEATURE_webengine_kerberos:BOOL=OFF \
-  -DFEATURE_webengine_extensions:BOOL=ON \
-  -DFEATURE_webengine_ozone_x11:BOOL=OFF \
-%if %{with vulkan}
-  -DFEATURE_webengine_vulkan:BOOL=ON \
-%endif
-  -DFEATURE_webengine_system_alsa:BOOL=ON \
-  -DFEATURE_webengine_system_pulseaudio:BOOL=ON \
-  -DFEATURE_webengine_system_gbm:BOOL=ON \
-  -DFEATURE_webengine_v8_context_snapshot:BOOL=ON \
-  -DFEATURE_webenginedriver:BOOL=ON \
-  -DFEATURE_pdf_v8:BOOL=OFF \
+  -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
-  -DQT_INSTALL_EXAMPLES_SOURCES=OFF \
-  %{nil}
+  -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
 %cmake_build
 
@@ -677,8 +500,6 @@ done
 
 %files
 %license LICENSE.*
-#%%{_qt6_archdatadir}/sbom/%%{qt_module}-%%{version}.spdx
-#%%{_qt6_archdatadir}/sbom/qtpdf-%%{version}.spdx
 %{_qt6_libdir}/libQt6WebEngineCore.so.*
 %{_qt6_libdir}/libQt6WebEngineQuick.so.*
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.so.*
@@ -771,27 +592,21 @@ done
 %{_qt6_libdir}/libQt6WebEngineQuick.prl
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.prl
 %{_qt6_libdir}/libQt6WebEngineWidgets.prl
-%dir %{_qt6_libdir}/cmake/Qt6Designer
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineCore
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineCorePrivate
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineCoreTools
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineQuick
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineQuickDelegatesQml
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineQuickPrivate
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgets
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgetsPrivate
 %{_qt6_libdir}/cmake/Qt6/*.cmake
 %{_qt6_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtWebEngine*
-%{_qt6_libdir}/cmake/Qt6Designer/Qt6QWebEngine*.cmake
 %{_qt6_libdir}/cmake/Qt6Qml/QmlPlugins/Qt6qtwebengine*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineCore/*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineCorePrivate/*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineCoreTools/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6Designer
+%{_qt6_libdir}/cmake/Qt6Designer/Qt6QWebEngine*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6WebEngineQuick
 %{_qt6_libdir}/cmake/Qt6WebEngineQuick/*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineQuickDelegatesQml/*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineQuickPrivate/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgets
 %{_qt6_libdir}/cmake/Qt6WebEngineWidgets/*.cmake
-%{_qt6_libdir}/cmake/Qt6WebEngineWidgetsPrivate/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6WebEngineCore
+%{_qt6_libdir}/cmake/Qt6WebEngineCore/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6WebEngineCoreTools
+%{_qt6_libdir}/cmake/Qt6WebEngineCoreTools/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6WebEngineQuickDelegatesQml
+%{_qt6_libdir}/cmake/Qt6WebEngineQuickDelegatesQml/*.cmake
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineCore.pc
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineQuick.pc
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineQuickDelegatesQml.pc
@@ -831,19 +646,13 @@ done
 %{_qt6_libdir}/libQt6Pdf.prl
 %{_qt6_libdir}/libQt6PdfQuick.prl
 %{_qt6_libdir}/libQt6PdfWidgets.prl
-%dir %{_qt6_libdir}/cmake/Qt6Pdf
-%dir %{_qt6_libdir}/cmake/Qt6PdfPrivate
-%dir %{_qt6_libdir}/cmake/Qt6PdfQuick
-%dir %{_qt6_libdir}/cmake/Qt6PdfQuickPrivate
-%dir %{_qt6_libdir}/cmake/Qt6PdfWidgets
-%dir %{_qt6_libdir}/cmake/Qt6PdfWidgetsPrivate
 %{_qt6_libdir}/cmake/Qt6Gui/Qt6QPdf*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6Pdf
 %{_qt6_libdir}/cmake/Qt6Pdf/*.cmake
-%{_qt6_libdir}/cmake/Qt6PdfPrivate/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6PdfQuick
 %{_qt6_libdir}/cmake/Qt6PdfQuick/*.cmake
-%{_qt6_libdir}/cmake/Qt6PdfQuickPrivate/*.cmake
+%dir %{_qt6_libdir}/cmake/Qt6PdfWidgets
 %{_qt6_libdir}/cmake/Qt6PdfWidgets/*.cmake
-%{_qt6_libdir}/cmake/Qt6PdfWidgetsPrivate/*.cmake
 %{_qt6_libdir}/cmake/Qt6Qml/QmlPlugins/Qt6Pdf*.cmake
 %{_qt6_libdir}/pkgconfig/Qt6Pdf.pc
 %{_qt6_libdir}/pkgconfig/Qt6PdfQuick.pc
