@@ -381,7 +381,7 @@ Summary: Example files for qt6-qtpdf
 %patch -P5 -p1 -b .chromium-141-glibc-2.42-SYS_SECCOMP
 
 
-%patch -P50 -p1 -b .fix-build.patch
+#patch -P50 -p1 -b .fix-build.patch
 
 # ## upstream patches
 # %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
