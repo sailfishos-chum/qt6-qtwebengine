@@ -1,0 +1,26 @@
+From 781e1dd1ccab5076411a71c20a20fc55f537c22a Mon Sep 17 00:00:00 2001
+From: Rinigus <rinigus.git@gmail.com>
+Date: Sun, 9 Nov 2025 21:35:46 +0200
+Subject: [PATCH] Define dummy HWCAP2_BTI
+
+---
+ .../partition_allocator/src/partition_alloc/aarch64_support.h  | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/chromium/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h b/chromium/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h
+index 600d4ed7843..bc19a0c8e88 100644
+--- a/chromium/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h
++++ b/chromium/base/allocator/partition_allocator/src/partition_alloc/aarch64_support.h
+@@ -26,6 +26,9 @@ namespace partition_alloc::internal {
+ constexpr bool IsBtiEnabled(uint64_t ifunc_hwcap,
+                             struct __ifunc_arg_t* ifunc_hw) {
+ #if PA_BUILDFLAG(PA_ARCH_CPU_ARM64) && defined(HAS_HW_CAPS)
++#ifndef HWCAP2_BTI
++#define HWCAP2_BTI (1 << 17)
++#endif
+   return (ifunc_hwcap & _IFUNC_ARG_HWCAP) && (ifunc_hw->_hwcap2 & HWCAP2_BTI);
+ #else
+   return false;
+-- 
+2.51.0
+

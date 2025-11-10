@@ -90,6 +90,7 @@ Patch50: qtwebengine-fix-build.patch
 
 # SFOS patches
 Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
+Patch1002: qtwebengine-fix-build-on-SFOS-Define-dummy-HWCAP2_BTI.patch
 
 # handled by qt6-srpm-macros, which defines %%qt6_qtwebengine_arches
 # FIXME use/update qt6_qtwebengine_arches
@@ -374,6 +375,11 @@ Summary: Example files for qt6-qtpdf
 #pushd src/3rdparty/chromium
 #%patch1001 -p2
 #popd
+
+pushd src/3rdparty/chromium
+%patch1002 -p2
+popd
+
 
 %patch -P1 -p1 -b .SIOCGSTAMP
 # %patch -P2 -p1 -b .link-pipewire
