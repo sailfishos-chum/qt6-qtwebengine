@@ -473,7 +473,9 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_webengine_system_libevent:BOOL=ON \
   -DFEATURE_webengine_system_ffmpeg:BOOL=ON \
   -DFEATURE_webengine_webrtc:BOOL=ON \
-  -DFEATURE_webengine_webrtc_pipewire:BOOL=ON \
+  -DFEATURE_webengine_ozone_x11:BOOL=OFF \
+  -DFEATURE_qtwebengine_widgets_build:BOOL=OFF \
+  -DFEATURE_qtpdf_widgets_build:BOOL=OFF \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
   -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
