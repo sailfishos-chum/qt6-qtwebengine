@@ -432,8 +432,12 @@ export NINJA_PATH=%{__ninja}
 %cmake_qt6 \
   -DCMAKE_TOOLCHAIN_FILE:STRING="%{_libdir}/cmake/Qt6/qt.toolchain.cmake" \
   -DFEATURE_qtpdf_build:BOOL=ON \
+  -DFEATURE_webengine_system_ffmpeg:BOOL=OFF \
   -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
   -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
+  -DFEATURE_webengine_ozone_x11:BOOL=OFF \
+  -DFEATURE_qtwebengine_widgets_build:BOOL=OFF \
+  -DFEATURE_qtpdf_widgets_build:BOOL=OFF \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
   -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
