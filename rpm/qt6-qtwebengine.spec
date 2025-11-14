@@ -540,7 +540,7 @@ done
 %{_qt6_libdir}/libQt6WebEngineCore.so.*
 %{_qt6_libdir}/libQt6WebEngineQuick.so.*
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.so.*
-%{_qt6_libdir}/libQt6WebEngineWidgets.so.*
+#{_qt6_libdir}/libQt6WebEngineWidgets.so.*
 %{_qt6_libdir}/qt6/libexec/gn
 %{_qt6_libdir}/qt6/libexec/qwebengine_convert_dict
 %{_qt6_libdir}/qt6/libexec/QtWebEngineProcess
@@ -617,18 +617,18 @@ done
 %{_qt6_headerdir}/QtWebEngineCore/*
 %dir %{_qt6_headerdir}/QtWebEngineQuick
 %{_qt6_headerdir}/QtWebEngineQuick/*
-%dir %{_qt6_headerdir}/QtWebEngineWidgets
-%{_qt6_headerdir}/QtWebEngineWidgets/*
+#dir %{_qt6_headerdir}/QtWebEngineWidgets
+#{_qt6_headerdir}/QtWebEngineWidgets/*
 %{_qt6_libdir}/qt6/metatypes/qt6webengine*.json
 %{_qt6_libdir}/qt6/modules/WebEngine*.json
 %{_qt6_libdir}/libQt6WebEngineCore.so
 %{_qt6_libdir}/libQt6WebEngineQuick.so
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.so
-%{_qt6_libdir}/libQt6WebEngineWidgets.so
+#{_qt6_libdir}/libQt6WebEngineWidgets.so
 %{_qt6_libdir}/libQt6WebEngineCore.prl
 %{_qt6_libdir}/libQt6WebEngineQuick.prl
 %{_qt6_libdir}/libQt6WebEngineQuickDelegatesQml.prl
-%{_qt6_libdir}/libQt6WebEngineWidgets.prl
+#{_qt6_libdir}/libQt6WebEngineWidgets.prl
 %{_qt6_libdir}/cmake/Qt6/*.cmake
 %{_qt6_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtWebEngine*
 %{_qt6_libdir}/cmake/Qt6Qml/QmlPlugins/Qt6qtwebengine*.cmake
@@ -636,8 +636,8 @@ done
 %{_qt6_libdir}/cmake/Qt6Designer/Qt6QWebEngine*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6WebEngineQuick
 %{_qt6_libdir}/cmake/Qt6WebEngineQuick/*.cmake
-%dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgets
-%{_qt6_libdir}/cmake/Qt6WebEngineWidgets/*.cmake
+#dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgets
+#{_qt6_libdir}/cmake/Qt6WebEngineWidgets/*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6WebEngineCore
 %{_qt6_libdir}/cmake/Qt6WebEngineCore/*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6WebEngineCoreTools
@@ -647,7 +647,7 @@ done
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineCore.pc
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineQuick.pc
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineQuickDelegatesQml.pc
-%{_qt6_libdir}/pkgconfig/Qt6WebEngineWidgets.pc
+#{_qt6_libdir}/pkgconfig/Qt6WebEngineWidgets.pc
 %{_qt6_archdatadir}/mkspecs/modules/qt_lib_webengine*.pri
 %{_qt6_plugindir}/designer/libqwebengineview.so
 
@@ -663,7 +663,7 @@ done
 %license LICENSE.*
 %{_qt6_libdir}/libQt6Pdf.so.*
 %{_qt6_libdir}/libQt6PdfQuick.so.*
-%{_qt6_libdir}/libQt6PdfWidgets.so.*
+#{_qt6_libdir}/libQt6PdfWidgets.so.*
 %dir %{_qt6_libdir}/qt6/qml/QtQuick/Pdf
 %{_qt6_libdir}/qt6/qml/QtQuick/Pdf/*
 %{_qt6_plugindir}/imageformats/libqpdf.so
@@ -673,27 +673,27 @@ done
 %{_qt6_headerdir}/QtPdf/*
 %dir %{_qt6_headerdir}/QtPdfQuick
 %{_qt6_headerdir}/QtPdfQuick/*
-%dir %{_qt6_headerdir}/QtPdfWidgets
-%{_qt6_headerdir}/QtPdfWidgets/*
+#dir %{_qt6_headerdir}/QtPdfWidgets
+#{_qt6_headerdir}/QtPdfWidgets/*
 %{_qt6_libdir}/qt6/metatypes/qt6pdf*.json
 %{_qt6_libdir}/qt6/modules/Pdf*.json
 %{_qt6_libdir}/libQt6Pdf.so
 %{_qt6_libdir}/libQt6PdfQuick.so
-%{_qt6_libdir}/libQt6PdfWidgets.so
+#{_qt6_libdir}/libQt6PdfWidgets.so
 %{_qt6_libdir}/libQt6Pdf.prl
 %{_qt6_libdir}/libQt6PdfQuick.prl
-%{_qt6_libdir}/libQt6PdfWidgets.prl
+#{_qt6_libdir}/libQt6PdfWidgets.prl
 %{_qt6_libdir}/cmake/Qt6Gui/Qt6QPdf*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6Pdf
 %{_qt6_libdir}/cmake/Qt6Pdf/*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6PdfQuick
 %{_qt6_libdir}/cmake/Qt6PdfQuick/*.cmake
-%dir %{_qt6_libdir}/cmake/Qt6PdfWidgets
-%{_qt6_libdir}/cmake/Qt6PdfWidgets/*.cmake
+#dir %{_qt6_libdir}/cmake/Qt6PdfWidgets
+#{_qt6_libdir}/cmake/Qt6PdfWidgets/*.cmake
 %{_qt6_libdir}/cmake/Qt6Qml/QmlPlugins/Qt6Pdf*.cmake
 %{_qt6_libdir}/pkgconfig/Qt6Pdf.pc
 %{_qt6_libdir}/pkgconfig/Qt6PdfQuick.pc
-%{_qt6_libdir}/pkgconfig/Qt6PdfWidgets.pc
+#{_qt6_libdir}/pkgconfig/Qt6PdfWidgets.pc
 %{_qt6_archdatadir}/mkspecs/modules/qt_lib_pdf*.pri
 
 %if 0%{?examples}
