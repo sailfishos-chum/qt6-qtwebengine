@@ -592,8 +592,8 @@ done
 %{_qt6_libdir}/cmake/Qt6/*.cmake
 %{_qt6_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtWebEngine*
 %{_qt6_libdir}/cmake/Qt6Qml/QmlPlugins/Qt6qtwebengine*.cmake
-%dir %{_qt6_libdir}/cmake/Qt6Designer
-%{_qt6_libdir}/cmake/Qt6Designer/Qt6QWebEngine*.cmake
+#dir %{_qt6_libdir}/cmake/Qt6Designer
+#{_qt6_libdir}/cmake/Qt6Designer/Qt6QWebEngine*.cmake
 %dir %{_qt6_libdir}/cmake/Qt6WebEngineQuick
 %{_qt6_libdir}/cmake/Qt6WebEngineQuick/*.cmake
 #dir %{_qt6_libdir}/cmake/Qt6WebEngineWidgets
@@ -609,7 +609,7 @@ done
 %{_qt6_libdir}/pkgconfig/Qt6WebEngineQuickDelegatesQml.pc
 #{_qt6_libdir}/pkgconfig/Qt6WebEngineWidgets.pc
 %{_qt6_archdatadir}/mkspecs/modules/qt_lib_webengine*.pri
-%{_qt6_plugindir}/designer/libqwebengineview.so
+#{_qt6_plugindir}/designer/libqwebengineview.so
 
 %files devtools
 %{_qt6_datadir}/resources/qtwebengine_devtools_resources.pak
