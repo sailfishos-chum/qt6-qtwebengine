@@ -144,6 +144,7 @@ Provides: bundled(minizip) = 2.8.1
 BuildRequires: pkgconfig(alsa)
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(egl)
+BuildRequires: pkgconfig(vulkan)
 #BuildRequires: pkgconfig(epoxy)
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(fontconfig)
@@ -447,6 +448,7 @@ export NINJA_PATH=%{__ninja}
   -DFEATURE_qtpdf_build:BOOL=ON \
   -DFEATURE_webengine_system_icu:BOOL=%{?use_system_libicu} \
   -DFEATURE_webengine_proprietary_codecs:BOOL=ON \
+  -DFEATURE_webengine_vulkan:BOOL=ON \
   -DQT_BUILD_EXAMPLES:BOOL=OFF \
   -DQT_INSTALL_EXAMPLES_SOURCES=OFF
 
