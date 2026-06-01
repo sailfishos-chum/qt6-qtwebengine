@@ -44,8 +44,8 @@
 
 Summary: Qt6 - QtWebEngine components
 Name:    qt6-qtwebengine
-Version: 6.8.3
-Release: 4%{?dist}
+Version: 6.11.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 # See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
@@ -366,9 +366,9 @@ Summary: Example files for qt6-qtpdf
 
 #mv pulse src/3rdparty/chromium/
 
-pushd src/3rdparty/chromium
-%patch1001 -p2
-popd
+# pushd src/3rdparty/chromium
+# %patch1001 -p2
+# popd
 
 %patch -P1 -p1 -b .SIOCGSTAMP
 # %patch -P2 -p1 -b .link-pipewire
