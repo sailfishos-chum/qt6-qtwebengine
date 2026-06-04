@@ -73,6 +73,7 @@ Patch3: qtwebengine-aarch64-new-stat.patch
 # FTBS warning: elaborated-type-specifier for a scoped enum must not
 # use the 'class' keyword
 Patch50: qtwebengine-fix-build.patch
+Patch51: qtwebengine-aarch64-hwcap2-bti.patch
 
 ## Upstream patches:
 # Fixes build with FFmpeg 7
@@ -370,6 +371,10 @@ Summary: Example files for qt6-qtpdf
 # %patch1001 -p2
 # popd
 
+pushd src/3rdparty/chromium
+%patch -P51 -p1 -b .aarch64-hwcap2-bti
+popd
+
 %patch -P1 -p1 -b .SIOCGSTAMP
 # %patch -P2 -p1 -b .link-pipewire
 %patch -P3 -p1 -b .aarch64-new-stat
@@ -660,4 +665,3 @@ done
 %files -n qt6-qtpdf-examples
 %{_qt6_examplesdir}/pdf*
 %endif
-
