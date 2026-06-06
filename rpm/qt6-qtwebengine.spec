@@ -86,6 +86,7 @@ Patch51: qtwebengine-aarch64-hwcap2-bti.patch
 
 # SFOS patches
 Patch1001: qtwebengine-fix-build-on-SFOS-Comment-out-GL-includes.patch
+Patch1002: qtwebengine-sfos-egl-validating-command-decoder.patch
 
 # handled by qt6-srpm-macros, which defines %%qt6_qtwebengine_arches
 # FIXME use/update qt6_qtwebengine_arches
@@ -380,6 +381,7 @@ popd
 %patch -P3 -p1 -b .aarch64-new-stat
 
 %patch -P50 -p1 -b .fix-build.patch
+%patch -P1002 -p1 -b .sfos-egl-validating-command-decoder
 
 # ## upstream patches
 # %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
